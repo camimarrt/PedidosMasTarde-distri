@@ -35,8 +35,8 @@ public class RutaDAO {
                 );
                 lista.add(r);
             }
-
             return lista;
+            
         } finally {
             if (conn != null) {
                 try {
