@@ -77,7 +77,8 @@ public class UDPServer {
                     Pedido p = consulta.getPedido(idPedido);
 
                     if (p != null) {
-                        respuesta.put("id",requestID);
+                        respuesta.put("ok", true);
+                        respuesta.put("requestId",requestID);
                         respuesta.put("id_cliente",p.getIdCliente());
                         respuesta.put("fecha_programada",p.getFechaProgramada());
                         respuesta.put("monto_total",p.getMontoTotal());
@@ -91,8 +92,7 @@ public class UDPServer {
                         respuesta.put("id_conductor", p.getIdConductor());
                         respuesta.put("id_ruta", p.getIdRuta());
                     }
-
-
+                    return respuesta.toJSONString();
                 default:
                     return error(requestID, "TIPO_NO_SOPORTADO", "Solo se admite GET_STOCK");
             }
@@ -114,7 +114,6 @@ public class UDPServer {
         }
         return (String) valor;
     }
-
 /* 
     private int enteroRequerido(JSONObject solicitud, String campo) {
         Object valor = solicitud.get(campo);
@@ -132,5 +131,4 @@ public class UDPServer {
         respuesta.put("mensaje", mensaje);
         return respuesta.toJSONString();
     }
-
 }
