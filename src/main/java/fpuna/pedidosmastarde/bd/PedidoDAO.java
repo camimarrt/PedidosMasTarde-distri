@@ -52,7 +52,7 @@ public class PedidoDAO {
     } 
 ////////////////////////
     public boolean solicitarTransporteBd(int idPedido) {
-        // Se asume que existe una columna 'estado' en la tabla de pedidos. Ajusta el nombre si es distinto.
+        
         String sql = "UPDATE pedido SET estado = 'TRANSPORTE_SOLICITADO' WHERE id = ?";
         
         try (java.sql.Connection conn = Bd.connect();
