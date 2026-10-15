@@ -7,14 +7,10 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
-import java.sql.SQLException;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-
-import fpuna.pedidosmastarde.entidad.Pedido;
-import fpuna.pedidosmastarde.servicio.ConsultaPedido;
 
 public class TCPServerHilo extends Thread {
     private final Socket socket;
@@ -59,17 +55,16 @@ public class TCPServerHilo extends Thread {
 
             switch (tipo.toUpperCase()) {
                 case "SOLICITAR_TRANSPORTE":
-                    // agregar codigo handler
-                    return null;
+                    // TODO: implementar en la fase siguiente
+                    return error(requestId, "NO_IMPLEMENTADO", "SOLICITAR_TRANSPORTE todavia no esta implementado");
+
                 // AGREGAR SERVICIOS ACA
                 // case "SERVICIO":
+
                 default:
-                    return error(requestId, "TIPO_NO_SOPORTADO", "Solo se admite GET_STOCK");
+                    return error(requestId, "TIPO_NO_SOPORTADO", "Tipo de solicitud no soportado: " + tipo);
             }
 
-        } catch (SQLException e) {
-            System.err.println("Error consultando stock: " + e.getMessage());
-            return error(requestId, "ERROR_BD", "No se pudo consultar el stock");
         } catch (ParseException e) {
             return error(null, "JSON_INVALIDO", "No se pudo interpretar la solicitud");
         } catch (IllegalArgumentException e) {
@@ -83,14 +78,6 @@ public class TCPServerHilo extends Thread {
             throw new IllegalArgumentException("Falta el campo " + campo);
         }
         return (String) valor;
-    }
-
-    private int enteroRequerido(JSONObject solicitud, String campo) {
-        Object valor = solicitud.get(campo);
-        if (!(valor instanceof Number)) {
-            throw new IllegalArgumentException("Falta el campo " + campo + " o no es un numero");
-        }
-        return ((Number) valor).intValue();
     }
 
     private String error(Object requestId, String codigo, String mensaje) {
