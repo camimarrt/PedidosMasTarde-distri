@@ -29,12 +29,20 @@ public class TCPServerHilo extends Thread {
                 BufferedWriter salida = new BufferedWriter(new OutputStreamWriter(
                         cliente.getOutputStream(), StandardCharsets.UTF_8))) {
             // Una solicitud por conexion: lee una linea JSON, responde y cierra
+            ////////////////////////////////////
             String solicitud = entrada.readLine();
             if (solicitud != null) {
-                salida.write(procesar(solicitud));
-                salida.write("\n");
-                salida.flush();
-            }
+            if (solicitud.startsWith("SOLICITAR_TRANSPORTE")) {
+            String respuesta = fpuna.pedidosmastarde.servicio.SolicitarTransporte.procesar(solicitud);
+            salida.write(respuesta + "\n");
+            salida.flush();
+            } else {
+
+            salida.write(procesar(solicitud));
+            salida.write("\n");
+            salida.flush();
+        }
+    }//////////////////////////
         } catch (IOException e) {
             System.err.println("Error atendiendo cliente TCP: " + e.getMessage());
         }
