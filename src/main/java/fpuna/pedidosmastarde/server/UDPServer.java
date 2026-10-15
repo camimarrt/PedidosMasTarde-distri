@@ -80,16 +80,10 @@ public class UDPServer {
                         respuesta.put("ok", true);
                         respuesta.put("requestId",requestID);
                         respuesta.put("id_cliente",p.getIdCliente());
-                        respuesta.put("fecha_programada",p.getFechaProgramada());
+                        respuesta.put("nombre_destinatario",p.getNombreDestinatario());
                         respuesta.put("monto_total",p.getMontoTotal());
                         respuesta.put("estado",p.getEstado());
                         respuesta.put("direccion", p.getDireccion());
-                        respuesta.put("email",p.getEmail());
-                        respuesta.put("nombre_destinatario", p.getNombreDestinatario());
-                        respuesta.put("telefono",p.getTelefono());
-                        respuesta.put("remitente",p.getRemitente());
-                        respuesta.put("cant_paquetes", p.getCantPaquetes());
-                        respuesta.put("id_conductor", p.getIdConductor());
                         respuesta.put("id_ruta", p.getIdRuta());
                     }
                     return respuesta.toJSONString();

@@ -14,7 +14,7 @@ public class PedidoDAO {
     // Devuelve una lista con el pedido buscado
     // Si el id no existe, la lista queda vacia.
     public List<Pedido> seleccionarPorId(int id) throws SQLException {
-        String query = "SELECT id, id_cliente, nombre_destinatario, direccion, id_ruta FROM envio WHERE id = ?;";
+        String query = "SELECT id, id_cliente, nombre_destinatario, monto_total, estado, direccion, id_ruta FROM envio WHERE id = ?;";
         List<Pedido> lista = new ArrayList<>();
 
         Connection conn = null;
@@ -30,7 +30,7 @@ public class PedidoDAO {
                 Pedido p = new Pedido(
                     rs.getInt("id"),
                     rs.getInt("id_cliente"),
-                    rs.getDate("nombre_destinatario"),
+                    rs.getString("nombre_destinatario"),
                     rs.getDouble("monto_total"),
                     rs.getString("estado"),
                     rs.getString("direccion"),
