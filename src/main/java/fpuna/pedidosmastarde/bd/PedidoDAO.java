@@ -52,7 +52,7 @@ public class PedidoDAO {
     } 
 ////////////////////////
     public boolean solicitarTransporteBd(int idPedido) {
-      String sql = "UPDATE envio SET estado = 'SOLICITADO' WHERE id = ?";
+        String sql = "UPDATE envio SET estado = 'SOLICITADO' WHERE id = ?";
         
         try (java.sql.Connection conn = Bd.connect();
              java.sql.PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -68,22 +68,26 @@ public class PedidoDAO {
         }
     }
     
-    public boolean registrarEnvio(Integer idProducto, Integer cantidad, String destino, String cliente) {
-        // Ajusta las columnas a las definidas en tu schema.sql de PedidosMasTarde
-        String sql = "INSERT INTO pedido (id_producto, cantidad, destino, cliente, estado) VALUES (?, ?, ?, ?, 'PENDIENTE')";
-        
+    // Guarda un pedido nuevo. Devuelve el id generado, o 0 si fallo.
+    public int registrarEnvio(String nombre, String direccion, long montoTotal) {
+        String sql = "INSERT INTO envio (id_cliente, nombre_destinatario, direccion, estado, id_ruta, monto_total) "
+                + "VALUES (1, ?, ?, 'Pendiente', 1, ?) RETURNING id";
+
         try (Connection conn = Bd.connect();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            
-            ps.setInt(1, idProducto);
-            ps.setInt(2, cantidad);
-            ps.setString(3, destino);
-            ps.setString(4, cliente);
 
-            return ps.executeUpdate() > 0;
+            ps.setString(1, nombre);
+            ps.setString(2, direccion);
+            ps.setLong(3, montoTotal);
+
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+            return 0;
         } catch (SQLException e) {
             e.printStackTrace();
-            return false;
+            return 0;
         }
     }
 }

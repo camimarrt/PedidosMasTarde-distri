@@ -33,15 +33,10 @@ CREATE TABLE envio (
     id                    SERIAL PRIMARY KEY,
     id_cliente            INTEGER NOT NULL,
     nombre_destinatario   VARCHAR(100) NOT NULL,
-    telefono              VARCHAR(20),
     direccion             VARCHAR(200) NOT NULL,
-    email                 VARCHAR(100),
-    remitente             VARCHAR(100) NOT NULL,
-    cant_paquetes         INTEGER NOT NULL,
     estado                VARCHAR(20) NOT NULL,
-    fecha_programada      DATE,
-    id_conductor          INTEGER REFERENCES conductor(id),
-    id_ruta               INTEGER REFERENCES ruta(id)
+    id_ruta               INTEGER REFERENCES ruta(id),
+    monto_total           BIGINT NOT NULL
 );
 
 INSERT INTO conductor (id, nombre, telefono, disponible) VALUES (1, 'Carlos Gomez', '981000111', TRUE);

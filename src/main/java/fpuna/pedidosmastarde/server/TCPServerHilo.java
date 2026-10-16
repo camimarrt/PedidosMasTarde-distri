@@ -12,6 +12,8 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import fpuna.pedidosmastarde.servicio.SolicitarTransporte;
+
 public class TCPServerHilo extends Thread {
     private final Socket socket;
 
@@ -28,21 +30,19 @@ public class TCPServerHilo extends Thread {
                         cliente.getInputStream(), StandardCharsets.UTF_8));
                 BufferedWriter salida = new BufferedWriter(new OutputStreamWriter(
                         cliente.getOutputStream(), StandardCharsets.UTF_8))) {
-            // Una solicitud por conexion: lee una linea JSON, responde y cierra
-            ////////////////////////////////////
+            // Una solicitud por conexion: lee una linea, responde y cierra
             String solicitud = entrada.readLine();
             if (solicitud != null) {
-            if (solicitud.startsWith("SOLICITAR_TRANSPORTE")) {
-            String respuesta = fpuna.pedidosmastarde.servicio.SolicitarTransporte.procesar(solicitud);
-            salida.write(respuesta + "\n");
-            salida.flush();
-            } else {
-
-            salida.write(procesar(solicitud));
-            salida.write("\n");
-            salida.flush();
-        }
-    }//////////////////////////
+                if (solicitud.startsWith("SOLICITAR_TRANSPORTE")) {
+                    // Formato de texto
+                    salida.write(SolicitarTransporte.procesar(solicitud));
+                } else {
+                    // Formato JSON
+                    salida.write(procesar(solicitud));
+                }
+                salida.write("\n");
+                salida.flush();
+            }
         } catch (IOException e) {
             System.err.println("Error atendiendo cliente TCP: " + e.getMessage());
         }
@@ -62,12 +62,25 @@ public class TCPServerHilo extends Thread {
             requestId = textoRequerido(solicitud, "requestId");
 
             switch (tipo.toUpperCase()) {
-                case "SOLICITAR_TRANSPORTE":
-                    // TODO: implementar en la fase siguiente
-                    return error(requestId, "NO_IMPLEMENTADO", "SOLICITAR_TRANSPORTE todavia no esta implementado");
+                case "REGISTRAR_PEDIDO": {
+                    String nombre = textoRequerido(solicitud, "nombre");
+                    String direccion = textoRequerido(solicitud, "direccion");
+                    long montoTotal = numeroRequerido(solicitud, "monto_total");
 
-                // AGREGAR SERVICIOS ACA
-                // case "SERVICIO":
+                    int idPedido = new SolicitarTransporte().registrarPedido(nombre, direccion, montoTotal);
+
+                    System.out.println("Request REGISTRAR_PEDIDO atendido: " + requestId);
+
+                    if (idPedido == 0) {
+                        return error(requestId, "ERROR_BD", "No se pudo guardar el pedido");
+                    }
+
+                    JSONObject respuesta = new JSONObject();
+                    respuesta.put("ok", true);
+                    respuesta.put("requestId", requestId);
+                    respuesta.put("idpedido", idPedido);
+                    return respuesta.toJSONString();
+                }
 
                 default:
                     return error(requestId, "TIPO_NO_SOPORTADO", "Tipo de solicitud no soportado: " + tipo);
@@ -86,6 +99,14 @@ public class TCPServerHilo extends Thread {
             throw new IllegalArgumentException("Falta el campo " + campo);
         }
         return (String) valor;
+    }
+
+    private long numeroRequerido(JSONObject solicitud, String campo) {
+        Object valor = solicitud.get(campo);
+        if (!(valor instanceof Number)) {
+            throw new IllegalArgumentException("Falta el campo " + campo + " o no es un numero");
+        }
+        return ((Number) valor).longValue();
     }
 
     private String error(Object requestId, String codigo, String mensaje) {
