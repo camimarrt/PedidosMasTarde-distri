@@ -52,13 +52,7 @@ public class PedidoDAO {
     } 
 ////////////////////////
     public boolean solicitarTransporteBd(int idPedido) {
-<<<<<<< HEAD
-        // Se asume que existe una columna 'estado' en la tabla de pedidos. Ajusta el nombre si es distinto.
-        String sql = "UPDATE envio SET estado = 'SOLICITADO' WHERE id = ?";
-=======
-        
-        String sql = "UPDATE pedido SET estado = 'TRANSPORTE_SOLICITADO' WHERE id = ?";
->>>>>>> 97f735a7c773260eccee0600a9be75d839c36e9f
+      String sql = "UPDATE envio SET estado = 'SOLICITADO' WHERE id = ?";
         
         try (java.sql.Connection conn = Bd.connect();
              java.sql.PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -70,6 +64,25 @@ public class PedidoDAO {
             
         } catch (java.sql.SQLException e) {
             System.err.println("Error al solicitar transporte en la BD: " + e.getMessage());
+            return false;
+        }
+    }
+    
+    public boolean registrarEnvio(Integer idProducto, Integer cantidad, String destino, String cliente) {
+        // Ajusta las columnas a las definidas en tu schema.sql de PedidosMasTarde
+        String sql = "INSERT INTO pedido (id_producto, cantidad, destino, cliente, estado) VALUES (?, ?, ?, ?, 'PENDIENTE')";
+        
+        try (Connection conn = Bd.connect();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setInt(1, idProducto);
+            ps.setInt(2, cantidad);
+            ps.setString(3, destino);
+            ps.setString(4, cliente);
+
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
             return false;
         }
     }

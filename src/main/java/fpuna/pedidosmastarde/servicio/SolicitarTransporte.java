@@ -3,7 +3,16 @@ package fpuna.pedidosmastarde.servicio;
 import fpuna.pedidosmastarde.bd.PedidoDAO;
 
 public class SolicitarTransporte {
-    
+    private PedidoDAO pedidoDAO = new PedidoDAO();
+
+    public boolean procesarSolicitud(Integer idProducto, Integer cantidad, String destino, String cliente) {
+        if (idProducto == null || cantidad == null || cantidad <= 0) {
+            return false;
+        }
+
+        // Llama al método registrarEnvio que agregaste en PedidoDAO (Paso 4)
+        return pedidoDAO.registrarEnvio(idProducto, cantidad, destino, cliente);
+    }
     public static String procesar(String peticion) {
         try {
             // Se espera el formato: "SOLICITAR_TRANSPORTE,123"
