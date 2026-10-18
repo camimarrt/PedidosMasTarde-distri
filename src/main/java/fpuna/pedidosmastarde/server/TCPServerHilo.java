@@ -63,11 +63,12 @@ public class TCPServerHilo extends Thread {
 
             switch (tipo.toUpperCase()) {
                 case "REGISTRAR_PEDIDO": {
+                    int idCliente = enteroRequerido(solicitud, "id_cliente");
                     String nombre = textoRequerido(solicitud, "nombre");
                     String direccion = textoRequerido(solicitud, "direccion");
                     long montoTotal = numeroRequerido(solicitud, "monto_total");
 
-                    int idPedido = new SolicitarTransporte().registrarPedido(nombre, direccion, montoTotal);
+                    int idPedido = new SolicitarTransporte().registrarPedido(idCliente, nombre, direccion, montoTotal);
 
                     System.out.println("Request REGISTRAR_PEDIDO atendido: " + requestId);
 
@@ -91,6 +92,14 @@ public class TCPServerHilo extends Thread {
         } catch (IllegalArgumentException e) {
             return error(requestId, "CAMPO_REQUERIDO", e.getMessage());
         }
+    }
+
+    private int enteroRequerido(JSONObject solicitud, String campo) {
+    Object valor = solicitud.get(campo);
+    if (!(valor instanceof Number)) {
+        throw new IllegalArgumentException("Falta el campo " + campo + " o no es un numero");
+    }
+    return ((Number) valor).intValue();
     }
 
     private String textoRequerido(JSONObject solicitud, String campo) {

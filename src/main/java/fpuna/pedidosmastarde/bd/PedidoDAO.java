@@ -69,16 +69,17 @@ public class PedidoDAO {
     }
     
     // Guarda un pedido nuevo. Devuelve el id generado, o 0 si fallo.
-    public int registrarEnvio(String nombre, String direccion, long montoTotal) {
+    public int registrarEnvio(int idCliente, String nombre, String direccion, long montoTotal) {
         String sql = "INSERT INTO envio (id_cliente, nombre_destinatario, direccion, estado, id_ruta, monto_total) "
-                + "VALUES (1, ?, ?, 'Pendiente', 1, ?) RETURNING id";
+                + "VALUES (?, ?, ?, 'Pendiente', 1, ?) RETURNING id";
 
         try (Connection conn = Bd.connect();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setString(1, nombre);
-            ps.setString(2, direccion);
-            ps.setLong(3, montoTotal);
+            
+            ps.setInt(1, idCliente);
+            ps.setString(2, nombre);
+            ps.setString(3, direccion);
+            ps.setLong(4, montoTotal);
 
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
