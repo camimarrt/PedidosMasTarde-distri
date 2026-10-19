@@ -14,7 +14,7 @@ public class PedidoDAO {
     // Devuelve una lista con el pedido buscado, si el id no existe, la lista queda vacia.
     // arma el query y busca en la BD por ID
     public List<Pedido> seleccionarPorId(int id) throws SQLException {
-        String query = "SELECT id, id_cliente, nombre_destinatario, monto_total, estado, direccion, id_ruta, id_prducto, cantidad FROM envio WHERE id = ?;";
+        String query = "SELECT id, id_cliente, nombre_destinatario, monto_total, estado, direccion, id_ruta, id_producto, cantidad FROM envio WHERE id = ?;";
         List<Pedido> lista = new ArrayList<>();
 
         Connection conn = null;
@@ -100,9 +100,9 @@ public class PedidoDAO {
         public int[] eliminarPedido(int idPedido) {
             String sql = "DELETE FROM envio WHERE id = ? RETURNING id_producto, cantidad";
 
-            try (Connection conn = Bd.connect();
-                PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
+            try {
+                Connection conn = Bd.connect();
+                PreparedStatement pstmt = conn.prepareStatement(sql);
                 pstmt.setInt(1, idPedido);
 
                 try (ResultSet rs = pstmt.executeQuery()) {

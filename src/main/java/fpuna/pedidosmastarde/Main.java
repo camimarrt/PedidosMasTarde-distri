@@ -16,7 +16,7 @@ import fpuna.pedidosmastarde.server.UDPServer;
 
 public class Main {
 
-    // direccion del servidor de eBye (se puede cambiar con argumentos)
+    // direccion del servidor de eBye 
     private static String hostEbye = "127.0.0.1";
     private static int puertoEbye = 6000;
 
@@ -61,8 +61,10 @@ public class Main {
             return;
         }
 
+        // devuelve un identificador para la solicitud
         String requestId = UUID.randomUUID().toString();
 
+        // crea un json de la solicitud
         JSONObject solicitud = new JSONObject();
         solicitud.put("tipo", "GET_STOCK");
         solicitud.put("requestId", requestId);
