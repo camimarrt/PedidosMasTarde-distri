@@ -24,20 +24,23 @@ public class TCPServerHilo extends Thread {
 
     @Override
     public void run() {
-        try (
-                Socket cliente = socket;
-                BufferedReader entrada = new BufferedReader(new InputStreamReader(
+        try {
+            Socket cliente = socket;
+
+            BufferedReader entrada = new BufferedReader(new InputStreamReader(
                         cliente.getInputStream(), StandardCharsets.UTF_8));
-                BufferedWriter salida = new BufferedWriter(new OutputStreamWriter(
-                        cliente.getOutputStream(), StandardCharsets.UTF_8))) {
-            // Una solicitud por conexion: lee una linea, responde y cierra
+
+            BufferedWriter salida = new BufferedWriter(new OutputStreamWriter(
+                        cliente.getOutputStream(), StandardCharsets.UTF_8));
+
+            // una solicitud por conexion. lee una linea, responde y cierra
             String solicitud = entrada.readLine();
             if (solicitud != null) {
                 if (solicitud.startsWith("SOLICITAR_TRANSPORTE")) {
-                    // Formato de texto
+                    // formato de texto para la salida de este servicio
                     salida.write(SolicitarTransporte.procesar(solicitud));
                 } else {
-                    // Formato JSON
+                    // formato JSON para la salida de este servicio
                     salida.write(procesar(solicitud));
                 }
                 salida.write("\n");
@@ -82,11 +85,9 @@ public class TCPServerHilo extends Thread {
                     respuesta.put("idpedido", idPedido);
                     return respuesta.toJSONString();
                 }
-
                 default:
                     return error(requestId, "TIPO_NO_SOPORTADO", "Tipo de solicitud no soportado: " + tipo);
             }
-
         } catch (ParseException e) {
             return error(null, "JSON_INVALIDO", "No se pudo interpretar la solicitud");
         } catch (IllegalArgumentException e) {
@@ -95,11 +96,11 @@ public class TCPServerHilo extends Thread {
     }
 
     private int enteroRequerido(JSONObject solicitud, String campo) {
-    Object valor = solicitud.get(campo);
-    if (!(valor instanceof Number)) {
-        throw new IllegalArgumentException("Falta el campo " + campo + " o no es un numero");
-    }
-    return ((Number) valor).intValue();
+        Object valor = solicitud.get(campo);
+        if (!(valor instanceof Number)) {
+            throw new IllegalArgumentException("Falta el campo " + campo + " o no es un numero");
+        }
+        return ((Number) valor).intValue();
     }
 
     private String textoRequerido(JSONObject solicitud, String campo) {

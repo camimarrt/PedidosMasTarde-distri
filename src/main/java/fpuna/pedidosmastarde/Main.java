@@ -16,21 +16,13 @@ import fpuna.pedidosmastarde.server.UDPServer;
 
 public class Main {
 
-    // Direccion del servidor de eBye (se puede cambiar con argumentos)
+    // direccion del servidor de eBye (se puede cambiar con argumentos)
     private static String hostEbye = "127.0.0.1";
     private static int puertoEbye = 6000;
 
     public static void main(String[] args) {
-        // Argumentos opcionales: puertoPropio hostEbye puertoEbye
-        int puerto = args.length > 0 ? Integer.parseInt(args[0]) : 6001;
-        if (args.length > 1) {
-            hostEbye = args[1];
-        }
-        if (args.length > 2) {
-            puertoEbye = Integer.parseInt(args[2]);
-        }
-
-        // Servidores: cada uno en su propio hilo para que no se bloqueen entre si
+        int puerto = 6001; 
+        // servidores: cada uno en su propio hilo para que no se bloqueen entre si
         Thread hiloUdp = new Thread(new UDPServer(puerto), "Servidor-UDP");
         Thread hiloTcp = new Thread(new TCPServer(puerto), "Servidor-TCP");
         hiloUdp.start();
@@ -38,7 +30,7 @@ public class Main {
 
         System.out.println("Servidores PedidosMasTarde iniciados en el puerto " + puerto + " (TCP y UDP).");
 
-        // Menu: PedidosMasTarde como cliente de eBye
+        // Menu de pedidosmastarde como cliente de ebye
         Scanner teclado = new Scanner(System.in);
         while (true) {
             System.out.println();
@@ -51,7 +43,7 @@ public class Main {
             if (opcion.equals("1")) {
                 consultarStock(teclado);
             } else if (opcion.equals("0")) {
-                System.out.println("Hasta luego.");
+                System.out.println("Hasta luego");
                 System.exit(0);
             } else {
                 System.out.println("Opcion invalida.");
@@ -81,14 +73,13 @@ public class Main {
             System.out.println("eBye no respondio en 3 segundos (servidor apagado o datagrama perdido).");
             return;
         }
-
+        
         try {
             JSONObject respuesta = (JSONObject) new JSONParser().parse(texto);
             if (!requestId.equals(respuesta.get("requestId"))) {
                 System.out.println("El requestId de la respuesta no coincide.");
-            } else if (Boolean.TRUE.equals(respuesta.get("ok"))) {
-                System.out.println("Stock disponible del producto " + idProducto
-                        + ": " + respuesta.get("stock_disponible"));
+            } else if (respuesta.get("ok") == Boolean.TRUE) {
+                System.out.println("Stock disponible del producto " + idProducto + ": " + respuesta.get("stock_disponible"));
             } else {
                 System.out.println("eBye rechazo la consulta: " + respuesta.get("mensaje"));
             }
@@ -97,10 +88,10 @@ public class Main {
         }
     }
 
-    // Envia un datagrama y espera la respuesta. Devuelve null si pasan 3 segundos sin respuesta.
+    // envia un datagrama y espera la respuesta. 
     private static String enviarUDP(String host, int puerto, String mensaje) {
-        try (DatagramSocket socket = new DatagramSocket()) {
-            socket.setSoTimeout(3000);
+        try ( DatagramSocket socket = new DatagramSocket() ) {
+            socket.setSoTimeout(3000); // devuelve null si pasan 3 segundos sin respuesta
 
             byte[] datos = mensaje.getBytes(StandardCharsets.UTF_8);
             DatagramPacket paquete = new DatagramPacket(datos, datos.length,
@@ -116,7 +107,7 @@ public class Main {
         } catch (SocketTimeoutException e) {
             return null;
         } catch (Exception e) {
-            System.out.println("Error de red: " + e.getMessage());
+            System.out.println("Error: " + e.getMessage());
             return null;
         }
     }

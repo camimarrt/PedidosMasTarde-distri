@@ -11,8 +11,8 @@ import fpuna.pedidosmastarde.entidad.Pedido;
 
 public class PedidoDAO {
 
-    // Devuelve una lista con el pedido buscado
-    // Si el id no existe, la lista queda vacia.
+    // Devuelve una lista con el pedido buscado, si el id no existe, la lista queda vacia.
+    // arma el query y busca en la BD por ID
     public List<Pedido> seleccionarPorId(int id) throws SQLException {
         String query = "SELECT id, id_cliente, nombre_destinatario, monto_total, estado, direccion, id_ruta FROM envio WHERE id = ?;";
         List<Pedido> lista = new ArrayList<>();
@@ -26,7 +26,7 @@ public class PedidoDAO {
 
             ResultSet rs = pstmt.executeQuery();
 
-            while (rs.next()) {
+            if (rs.next()) {
                 Pedido p = new Pedido(
                     rs.getInt("id"),
                     rs.getInt("id_cliente"),
@@ -52,14 +52,13 @@ public class PedidoDAO {
     } 
 ////////////////////////
     public boolean solicitarTransporteBd(int idPedido) {
-        String sql = "UPDATE envio SET estado = 'SOLICITADO' WHERE id = ?";
+        String query = "UPDATE envio SET estado = 'SOLICITADO' WHERE id = ?";
         
-        try (java.sql.Connection conn = Bd.connect();
-             java.sql.PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            
+        try {
+            java.sql.Connection conn = Bd.connect();
+            java.sql.PreparedStatement pstmt = conn.prepareStatement(query);
             pstmt.setInt(1, idPedido);
             int filasAfectadas = pstmt.executeUpdate();
-            
             return filasAfectadas > 0;
             
         } catch (java.sql.SQLException e) {
@@ -68,14 +67,16 @@ public class PedidoDAO {
         }
     }
     
-    // Guarda un pedido nuevo. Devuelve el id generado, o 0 si fallo.
+    // guarda un pedido nuevo, devuelve el id generado o 0 si falla
     public int registrarEnvio(int idCliente, String nombre, String direccion, long montoTotal) {
         String sql = "INSERT INTO envio (id_cliente, nombre_destinatario, direccion, estado, id_ruta, monto_total) "
-                + "VALUES (?, ?, ?, 'Pendiente', 1, ?) RETURNING id";
+                + "VALUES (?, ?, ?, 'Solicitado', 1, ?) RETURNING id";
 
-        try (Connection conn = Bd.connect();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try {
+            Connection conn = Bd.connect();
+            PreparedStatement ps = conn.prepareStatement(sql);
             
+            // prepara el query con los datos que recibió
             ps.setInt(1, idCliente);
             ps.setString(2, nombre);
             ps.setString(3, direccion);
