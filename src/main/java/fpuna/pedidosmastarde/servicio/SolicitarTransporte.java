@@ -6,12 +6,12 @@ public class SolicitarTransporte {
 
     private PedidoDAO pedidoDAO = new PedidoDAO();
 
-    // Guarda el pedido que llega de eBye. Devuelve el id generado, o 0 si fallo.
+    // guarda el pedido que llega de eBye. Devuelve el id generado, o 0 si fallo.
     public int registrarPedido(int idCliente, String nombre, String direccion, long montoTotal) {
         return pedidoDAO.registrarEnvio(idCliente, nombre, direccion, montoTotal);
     }
 
-    // Formato de texto: "SOLICITAR_TRANSPORTE,<id_pedido>" (opcion 2 del menu de eBye)
+    // formato de texto: "SOLICITAR_TRANSPORTE,<id_pedido>" (opcion 2 del menu de eBye)
     public static String procesar(String peticion) {
         try {
             String[] partes = peticion.split(",");

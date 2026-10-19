@@ -29,7 +29,7 @@ public class UDPServer implements Runnable {
             byte[] buffer = new byte[2048];
 
             while (true) {
-                // Espera un datagrama (se queda bloqueado hasta que llegue uno)
+                // espera un datagrama (se queda bloqueado hasta que llegue uno)
                 DatagramPacket paquete = new DatagramPacket(buffer, buffer.length);
                 socket.receive(paquete);
 
@@ -38,7 +38,7 @@ public class UDPServer implements Runnable {
 
                 String respuesta = procesar(solicitud);
 
-                // Responde a la misma direccion y puerto de donde vino el datagrama
+                // responde a la misma direccion y puerto de donde vino el datagrama
                 byte[] datos = respuesta.getBytes(StandardCharsets.UTF_8);
                 DatagramPacket paqueteRespuesta = new DatagramPacket(datos,
                         datos.length, paquete.getAddress(), paquete.getPort());
@@ -72,8 +72,7 @@ public class UDPServer implements Runnable {
                     System.out.println("Request atendido: " + requestId);
 
                     if (ruta == null) {
-                        return error(requestId, "RUTA_NO_ENCONTRADA",
-                                "No existe la ruta " + idRuta);
+                        return error(requestId, "RUTA_NO_ENCONTRADA", "No existe la ruta " + idRuta);
                     }
                     return respuestaCotizar(requestId, ruta);
                 }
@@ -118,6 +117,9 @@ public class UDPServer implements Runnable {
                     }
                 }
 
+
+                // AGREGAR SERVICIOS ACA
+                // case "SERVICIO":
                 default:
                     return error(requestId, "TIPO_NO_SOPORTADO", "Tipo de solicitud no soportado: " + tipo);
             }

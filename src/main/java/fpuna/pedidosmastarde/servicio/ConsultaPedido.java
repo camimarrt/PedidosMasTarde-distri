@@ -18,7 +18,7 @@ public class ConsultaPedido {
         if (lista.isEmpty()) {
             return null;
         }
-
+        
         return lista.get(0);
     }
 }
