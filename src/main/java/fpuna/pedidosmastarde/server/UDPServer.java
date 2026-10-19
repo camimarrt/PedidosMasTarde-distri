@@ -11,9 +11,7 @@ import org.json.simple.parser.ParseException;
 
 import fpuna.pedidosmastarde.bd.PedidoDAO;
 import fpuna.pedidosmastarde.entidad.Pedido;
-import fpuna.pedidosmastarde.entidad.Ruta;
 import fpuna.pedidosmastarde.servicio.ConsultaPedido;
-import fpuna.pedidosmastarde.servicio.CotizarEnvio;
 
 public class UDPServer implements Runnable {
     private final int puerto;
@@ -63,20 +61,6 @@ public class UDPServer implements Runnable {
             requestId = textoRequerido(solicitud, "requestId");
 
             switch (tipo.toUpperCase()) {
-                case "COTIZAR_ENVIO":{
-                    int idRuta = enteroRequerido(solicitud, "id_ruta");
-
-                    CotizarEnvio cotizar = new CotizarEnvio();
-                    Ruta ruta = cotizar.getRuta(idRuta);
-
-                    System.out.println("Request atendido: " + requestId);
-
-                    if (ruta == null) {
-                        return error(requestId, "RUTA_NO_ENCONTRADA", "No existe la ruta " + idRuta);
-                    }
-                    return respuestaCotizar(requestId, ruta);
-                }
-
                 case "CONSULTAR_PEDIDO": {
                     int idPedido = enteroRequerido(solicitud, "id");
 
@@ -156,16 +140,6 @@ public class UDPServer implements Runnable {
         respuesta.put("requestId", requestId);
         respuesta.put("codigo", codigo);
         respuesta.put("mensaje", mensaje);
-        return respuesta.toJSONString();
-    }
-
-    private String respuestaCotizar(String requestId, Ruta ruta) {
-        JSONObject respuesta = new JSONObject();
-        respuesta.put("ok", true);
-        respuesta.put("requestId", requestId);
-        respuesta.put("zona", ruta.getZona());
-        respuesta.put("costo", ruta.getCosto());
-        respuesta.put("tiempo_estimado", ruta.getTiempoEstimado());
         return respuesta.toJSONString();
     }
 
