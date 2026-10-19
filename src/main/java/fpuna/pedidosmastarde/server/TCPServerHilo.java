@@ -70,8 +70,10 @@ public class TCPServerHilo extends Thread {
                     String nombre = textoRequerido(solicitud, "nombre");
                     String direccion = textoRequerido(solicitud, "direccion");
                     long montoTotal = numeroRequerido(solicitud, "monto_total");
+                    int idProducto = enteroRequerido(solicitud, "id_producto");
+                    int cantidad = enteroRequerido(solicitud, "cantidad");
 
-                    int idPedido = new SolicitarTransporte().registrarPedido(idCliente, nombre, direccion, montoTotal);
+                    int idPedido = new SolicitarTransporte().registrarPedido(idCliente, nombre, direccion, montoTotal, idProducto, cantidad);
 
                     System.out.println("Request REGISTRAR_PEDIDO atendido: " + requestId);
 

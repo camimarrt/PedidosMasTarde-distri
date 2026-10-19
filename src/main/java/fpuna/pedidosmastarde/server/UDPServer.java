@@ -94,8 +94,16 @@ public class UDPServer implements Runnable {
                     int idPedido = enteroRequerido(solicitud, "id");
 
                     PedidoDAO dao = new PedidoDAO();
-                    if (dao.eliminarPedido(idPedido)) {
-                        return respuestaExito(requestId, "Pedido cancelado y eliminado exitosamente");
+                    int[] eliminado = dao.eliminarPedido(idPedido);
+
+                    if (eliminado != null) {
+                        JSONObject respuesta = new JSONObject();
+                        respuesta.put("ok", true);
+                        respuesta.put("requestId", requestId);
+                        respuesta.put("mensaje", "Pedido cancelado y eliminado exitosamente");
+                        respuesta.put("id_producto", eliminado[0]);
+                        respuesta.put("cantidad", eliminado[1]);
+                        return respuesta.toJSONString();
                     } else {
                         return error(requestId, "ERROR_ELIMINAR", "No se pudo eliminar el pedido " + idPedido);
                     }

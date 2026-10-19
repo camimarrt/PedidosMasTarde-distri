@@ -8,8 +8,10 @@ public class Pedido {
     private String estado;
     private String direccion;
     private Integer id_ruta;
+    private Integer idProducto;
+    private Integer cantidad;
 
-    public Pedido(Integer id, Integer id_cliente, String nombre_destinatario, Double monto_total, String estado, String direccion, Integer id_ruta) {
+    public Pedido(Integer id, Integer id_cliente, String nombre_destinatario, Double monto_total, String estado, String direccion, Integer id_ruta, Integer idProducto, Integer cantidad) {
         this.id = id;
         this.id_cliente = id_cliente;
         this.nombre_destinatario = nombre_destinatario;
@@ -17,6 +19,8 @@ public class Pedido {
         this.estado = estado;
         this.direccion = direccion;
         this.id_ruta = id_ruta;
+        this.idProducto = idProducto;
+        this.cantidad = cantidad;
     }
 
     public Integer getId() {
@@ -74,4 +78,9 @@ public class Pedido {
     public void setIdRuta(Integer id_ruta) {
         this.id_ruta = id_ruta;
     }
+    public Integer getIdProducto() { return idProducto; }
+    public void setIdProducto(int idProducto) { this.idProducto = idProducto; }
+
+    public Integer getCantidad() { return cantidad; }
+    public void setCantidad(int cantidad) { this.cantidad = cantidad; }
 }

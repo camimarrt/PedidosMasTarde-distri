@@ -14,7 +14,7 @@ public class PedidoDAO {
     // Devuelve una lista con el pedido buscado, si el id no existe, la lista queda vacia.
     // arma el query y busca en la BD por ID
     public List<Pedido> seleccionarPorId(int id) throws SQLException {
-        String query = "SELECT id, id_cliente, nombre_destinatario, monto_total, estado, direccion, id_ruta FROM envio WHERE id = ?;";
+        String query = "SELECT id, id_cliente, nombre_destinatario, monto_total, estado, direccion, id_ruta, id_prducto, cantidad FROM envio WHERE id = ?;";
         List<Pedido> lista = new ArrayList<>();
 
         Connection conn = null;
@@ -34,7 +34,9 @@ public class PedidoDAO {
                     rs.getDouble("monto_total"),
                     rs.getString("estado"),
                     rs.getString("direccion"),
-                    rs.getInt("id_ruta")
+                    rs.getInt("id_ruta"),
+                    rs.getInt("id_producto"),
+                    rs.getInt("cantidad")
                 );
                 lista.add(p);
             }
@@ -68,9 +70,9 @@ public class PedidoDAO {
     }
     
     // guarda un pedido nuevo, devuelve el id generado o 0 si falla
-    public int registrarEnvio(int idCliente, String nombre, String direccion, long montoTotal) {
-        String sql = "INSERT INTO envio (id_cliente, nombre_destinatario, direccion, estado, id_ruta, monto_total) "
-                + "VALUES (?, ?, ?, 'Solicitado', 1, ?) RETURNING id";
+    public int registrarEnvio(int idCliente, String nombre, String direccion, long montoTotal, int idProducto, int cantidad) {
+        String sql = "INSERT INTO envio (id_cliente, nombre_destinatario, direccion, estado, id_ruta, id_producto, cantidad, monto_total) "
+                + "VALUES (?, ?, ?, 'Solicitado', 1, ?, ?, ?) RETURNING id";
 
         try {
             Connection conn = Bd.connect();
@@ -80,7 +82,9 @@ public class PedidoDAO {
             ps.setInt(1, idCliente);
             ps.setString(2, nombre);
             ps.setString(3, direccion);
-            ps.setLong(4, montoTotal);
+            ps.setInt(4, idProducto);
+            ps.setInt(5, cantidad);
+            ps.setLong(6, montoTotal);
 
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
@@ -93,23 +97,26 @@ public class PedidoDAO {
         }
     }
         // Metodo para eliminar el pedido si el cliente lo cancela
-    public boolean eliminarPedido(int idPedido) {
-        // Asumiendo que tu tabla se llama "pedido" o "pedidos"
-        String sql = "DELETE FROM envio WHERE id = ?"; 
-        
-        try (Connection conn = Bd.connect();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            
-            pstmt.setInt(1, idPedido);
-            int filasAfectadas = pstmt.executeUpdate();
-            
-            return filasAfectadas > 0;
-            
-        } catch (SQLException e) {
-            System.err.println("Error al eliminar el pedido: " + e.getMessage());
-            return false;
+        public int[] eliminarPedido(int idPedido) {
+            String sql = "DELETE FROM envio WHERE id = ? RETURNING id_producto, cantidad";
+
+            try (Connection conn = Bd.connect();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+                pstmt.setInt(1, idPedido);
+
+                try (ResultSet rs = pstmt.executeQuery()) {
+                    if (rs.next()) {
+                        return new int[] { rs.getInt("id_producto"), rs.getInt("cantidad") };
+                    }
+                }
+                return null;
+
+            } catch (SQLException e) {
+                System.err.println("Error al eliminar el pedido: " + e.getMessage());
+                return null;
+            }
         }
-    }
 
     // Método para actualizar el estado del pedido (ej. de Pendiente a Solicitado)
     public boolean actualizarEstadoPedido(int idPedido, String nuevoEstado) {
