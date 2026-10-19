@@ -9,6 +9,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import fpuna.pedidosmastarde.bd.PedidoDAO;
 import fpuna.pedidosmastarde.entidad.Pedido;
 import fpuna.pedidosmastarde.entidad.Ruta;
 import fpuna.pedidosmastarde.servicio.ConsultaPedido;
@@ -62,7 +63,7 @@ public class UDPServer implements Runnable {
             requestId = textoRequerido(solicitud, "requestId");
 
             switch (tipo.toUpperCase()) {
-                case "COTIZAR_ENVIO":
+                case "COTIZAR_ENVIO":{
                     int idRuta = enteroRequerido(solicitud, "id_ruta");
 
                     CotizarEnvio cotizar = new CotizarEnvio();
@@ -75,8 +76,9 @@ public class UDPServer implements Runnable {
                                 "No existe la ruta " + idRuta);
                     }
                     return respuestaCotizar(requestId, ruta);
+                }
 
-                case "CONSULTAR_PEDIDO":
+                case "CONSULTAR_PEDIDO": {
                     int idPedido = enteroRequerido(solicitud, "id");
 
                     ConsultaPedido consulta = new ConsultaPedido();
@@ -89,9 +91,32 @@ public class UDPServer implements Runnable {
                                 "No existe el pedido " + idPedido);
                     }
                     return respuestaPedido(requestId, p);
+                }
 
                 // AGREGAR SERVICIOS ACA
                 // case "SERVICIO":
+                case "ACTUALIZAR_ESTADO":{
+                    int idPedido = enteroRequerido(solicitud, "id");
+                    String nuevoEstado = textoRequerido(solicitud, "estado");
+
+                    PedidoDAO dao = new PedidoDAO();
+                    if (dao.actualizarEstadoPedido(idPedido, nuevoEstado)) {
+                        return respuestaExito(requestId, "Estado actualizado correctamente a " + nuevoEstado);
+                    } else {
+                        return error(requestId, "ERROR_ACTUALIZACION", "No se pudo actualizar el estado del pedido");
+                    }
+                }
+
+                case "ELIMINAR_PEDIDO": {
+                    int idPedido = enteroRequerido(solicitud, "id");
+
+                    PedidoDAO dao = new PedidoDAO();
+                    if (dao.eliminarPedido(idPedido)) {
+                        return respuestaExito(requestId, "Pedido cancelado y eliminado exitosamente");
+                    } else {
+                        return error(requestId, "ERROR_ELIMINAR", "No se pudo eliminar el pedido " + idPedido);
+                    }
+                }
 
                 default:
                     return error(requestId, "TIPO_NO_SOPORTADO", "Tipo de solicitud no soportado: " + tipo);
@@ -154,4 +179,11 @@ public class UDPServer implements Runnable {
         respuesta.put("id_ruta", p.getIdRuta());
         return respuesta.toJSONString();
     }
+    private String respuestaExito(Object requestId, String mensaje) {
+    JSONObject respuesta = new JSONObject();
+    respuesta.put("ok", true);
+    respuesta.put("requestId", requestId);
+    respuesta.put("mensaje", mensaje);
+    return respuesta.toJSONString();
+}
 }

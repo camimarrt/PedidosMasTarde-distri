@@ -91,4 +91,42 @@ public class PedidoDAO {
             return 0;
         }
     }
+        // Metodo para eliminar el pedido si el cliente lo cancela
+    public boolean eliminarPedido(int idPedido) {
+        // Asumiendo que tu tabla se llama "pedido" o "pedidos"
+        String sql = "DELETE FROM envio WHERE id = ?"; 
+        
+        try (Connection conn = Bd.connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setInt(1, idPedido);
+            int filasAfectadas = pstmt.executeUpdate();
+            
+            return filasAfectadas > 0;
+            
+        } catch (SQLException e) {
+            System.err.println("Error al eliminar el pedido: " + e.getMessage());
+            return false;
+        }
+    }
+
+    // Método para actualizar el estado del pedido (ej. de Pendiente a Solicitado)
+    public boolean actualizarEstadoPedido(int idPedido, String nuevoEstado) {
+        // Asumiendo que tienes una columna "estado" en tu tabla "pedido"
+        String sql = "UPDATE envio SET estado = ? WHERE id = ?";
+        
+        try (Connection conn = Bd.connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setString(1, nuevoEstado);
+            pstmt.setInt(2, idPedido);
+            
+            int filasAfectadas = pstmt.executeUpdate();
+            return filasAfectadas > 0;
+            
+        } catch (SQLException e) {
+            System.err.println("Error al actualizar el estado: " + e.getMessage());
+            return false;
+        }
+    }
 }
